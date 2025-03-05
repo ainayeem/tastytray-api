@@ -1,55 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
+import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { Meal } from "../meal/meal.model";
+import { MealProvider } from "../mealProvider/mealProvider.model";
 import { User } from "../user/user.model";
 import { Order } from "./order.model";
-
-// const createOrderInDB = async (user: JwtPayload, payload: { meals: { meal: string; quantity: number }[]; customizations?: string[] }) => {
-//   const dbUser = await User.findById(user._id);
-
-//   if (!payload?.meals?.length) {
-//     throw new AppError(StatusCodes.NOT_ACCEPTABLE, "Meals are required");
-//   }
-
-//   let totalPrice = 0;
-//   // get all meal IDs
-//   const mealIds = payload.meals.map((m) => m.meal);
-
-//   //get each product
-//   const dbMeals = await Meal.find({ _id: { $in: mealIds } });
-
-//   // Map products key value
-//   const mealMap = new Map(dbMeals.map((m) => [m._id.toString(), m]));
-
-//   //   check availibility of each product
-//   for (const { meal, quantity } of payload.meals) {
-//     const dbMeal = mealMap.get(meal);
-//     if (!dbMeal) {
-//       throw new AppError(StatusCodes.NOT_FOUND, ` Meal with id ${meal} not found`);
-//     }
-//     if (!dbMeal.availability) {
-//       throw new AppError(StatusCodes.NOT_ACCEPTABLE, ` Meal with id ${meal} is not available`);
-//     }
-//   }
-
-//   //order placement
-//   const orderedMeals = payload.meals.map(({ meal, quantity }) => {
-//     const dbMeal = mealMap.get(meal)!;
-//     totalPrice += dbMeal.price * quantity;
-//     return { meal: dbMeal._id, quantity };
-//   });
-
-//   const order = await Order.create({
-//     user: dbUser?._id,
-//     meals: orderedMeals,
-//     totalPrice,
-//     orderDate: new Date(),
-//     customizations: payload.customizations,
-//   });
-
-//   return order;
-// };
 
 const createOrderInDB = async (user: JwtPayload, payload: { meals: { meal: string; quantity: number }[]; customizations?: string[] }) => {
   if (!payload?.meals?.length) {
@@ -80,6 +36,7 @@ const createOrderInDB = async (user: JwtPayload, payload: { meals: { meal: strin
 
   return await Order.create({
     user: dbUser?._id,
+    mealProvider: dbMeals[0].mealProvider,
     meals: orderedMeals,
     totalPrice,
     orderDate: new Date(),
@@ -87,6 +44,49 @@ const createOrderInDB = async (user: JwtPayload, payload: { meals: { meal: strin
   });
 };
 
+const getAllOrderFromDB = async (query: Record<string, unknown>, user: JwtPayload) => {
+  const mealProvider = await MealProvider.findOne({ user: user._id });
+  if (!mealProvider) {
+    throw new AppError(StatusCodes.NOT_FOUND, " Meal provider not found");
+  }
+
+  const OrderSearchableFields = ["status"];
+  const orderQuery = new QueryBuilder(Order.find({ mealProvider: mealProvider._id }), query)
+    .search(OrderSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery;
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
+const getCustomerOrderFromDB = async (query: Record<string, unknown>, user: JwtPayload) => {
+  const OrderSearchableFields = ["status"];
+  const orderQuery = new QueryBuilder(Order.find({ user: user._id }).populate("user mealProvider meals.meal"), query)
+    .search(OrderSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await orderQuery.modelQuery;
+  const meta = await orderQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
+
 export const OrderServices = {
   createOrderInDB,
+  getAllOrderFromDB,
+  getCustomerOrderFromDB,
 };

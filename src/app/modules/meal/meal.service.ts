@@ -11,7 +11,6 @@ const createMealInDB = async (payload: TMeal, userId: Types.ObjectId) => {
   }
   payload.mealProvider = mealProvider._id;
 
-  //   console.log("🚀 ~ createMealInDB ~ userId:", userId);
   const result = await Meal.create(payload);
   return result;
 };

@@ -7,4 +7,8 @@ const router = express.Router();
 
 router.post("/create-order", auth(USER_ROLE.customer), OrderControllers.createOrder);
 
+router.get("/meal-provider-order", auth(USER_ROLE.mealProvider), OrderControllers.getAllOrders);
+
+router.get("/customer-order", auth(USER_ROLE.customer), OrderControllers.getCustomerOrders);
+
 export const OrderRoutes = router;

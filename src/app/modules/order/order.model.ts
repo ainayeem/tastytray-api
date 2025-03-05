@@ -8,6 +8,11 @@ const orderSchema = new Schema<TOrder>(
       ref: "User",
       required: [true, "User is required"],
     },
+    mealProvider: {
+      type: Schema.Types.ObjectId,
+      ref: "MealProvider",
+      required: [true, "Meal provider is required"],
+    },
     meals: [
       {
         meal: {

@@ -100,7 +100,6 @@ const loginInDB = async (email: string, password: string) => {
     email: user.email,
     role: user.role,
   };
-  // console.log("🚀 ~ loginInDB ~ jwtPayload:", jwtPayload);
 
   const accessToken = createToken(jwtPayload, config.jwt_access_secret as string, config.jwt_access_expires_in as string);
 

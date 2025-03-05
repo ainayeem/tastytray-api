@@ -33,7 +33,6 @@ const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
 
   const result = await UserServices.loginInDB(email, password);
-  // console.log("🚀 ~ login ~ result:", result);
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

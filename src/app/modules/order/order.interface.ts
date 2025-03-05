@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 
 export type TOrder = {
   user: Types.ObjectId;
+  mealProvider: Types.ObjectId;
   meals: {
     meal: Types.ObjectId;
     quantity: number;

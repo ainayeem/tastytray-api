@@ -24,7 +24,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(StatusCodes.UNAUTHORIZED, "Unauthorized");
     }
     const { _id, email, role } = decoded;
-    console.log("🚀 ~ returncatchAsync ~ _id, email, role:", _id, email, role);
 
     // checking if the user is exist
     const user = await User.isUserExistsByEmail(email);
