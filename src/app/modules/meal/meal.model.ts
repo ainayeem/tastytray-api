@@ -35,6 +35,14 @@ const mealSchema = new Schema<TMeal>(
         message: "Category must be one of Breakfast, Lunch, Dinner, Snack, Dessert",
       },
     },
+    portionSize: {
+      type: String,
+      required: [true, "Portion size is required"],
+    },
+    dietaryPreferences: {
+      type: [String],
+      required: false,
+    },
     imgUrl: {
       type: String,
       required: [true, "Image URL is required"],

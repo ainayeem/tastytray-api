@@ -26,7 +26,46 @@ const getAllMeals = catchAsync(async (req, res) => {
   });
 });
 
+const getSingleMeal = catchAsync(async (req, res) => {
+  const { id: mealId } = req.params;
+  const result = await MealServices.getSingleMealFromDB(mealId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Meal fetched successfully",
+    data: result,
+  });
+});
+
+const updateMeal = catchAsync(async (req, res) => {
+  const { id: mealId } = req.params;
+  const result = await MealServices.updateMealInDB(mealId, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Meal updated successfully",
+    data: result,
+  });
+});
+
+const deleteMeal = catchAsync(async (req, res) => {
+  const { id: mealId } = req.params;
+  const result = await MealServices.deleteMealInDB(mealId);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Meal deleted successfully",
+    data: result,
+  });
+});
+
 export const MealControllers = {
   createMeal,
   getAllMeals,
+  getSingleMeal,
+  updateMeal,
+  deleteMeal,
 };

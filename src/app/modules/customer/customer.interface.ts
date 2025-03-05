@@ -6,4 +6,5 @@ export type TCustomer = {
   email: string;
   phone: string;
   address: string;
+  preferences?: string[];
 };

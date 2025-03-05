@@ -11,7 +11,7 @@ const createMealInDB = async (payload: TMeal, userId: Types.ObjectId) => {
   }
   payload.mealProvider = mealProvider._id;
 
-  console.log("🚀 ~ createMealInDB ~ userId:", userId);
+  //   console.log("🚀 ~ createMealInDB ~ userId:", userId);
   const result = await Meal.create(payload);
   return result;
 };
@@ -29,7 +29,25 @@ const getAllMealsFromDB = async (query: Record<string, unknown>) => {
   };
 };
 
+const getSingleMealFromDB = async (id: string) => {
+  const result = await Meal.findById(id).populate("mealProvider");
+  return result;
+};
+
+const updateMealInDB = async (id: string, payload: Partial<TMeal>) => {
+  const result = await Meal.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+  return result;
+};
+
+const deleteMealInDB = async (id: string) => {
+  await Meal.findByIdAndDelete(id);
+  return null;
+};
+
 export const MealServices = {
   createMealInDB,
   getAllMealsFromDB,
+  getSingleMealFromDB,
+  updateMealInDB,
+  deleteMealInDB,
 };

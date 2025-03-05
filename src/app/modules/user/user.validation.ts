@@ -9,7 +9,7 @@ export const createMealProviderValidationSchema = z.object({
       phone: z.string().min(11).max(11),
       address: z.string().min(2).max(100),
       cuisineSpecialties: z.array(z.string()).min(1),
-      experience: z.string(),
+      experience: z.number().int().min(1).max(50),
     }),
   }),
 });

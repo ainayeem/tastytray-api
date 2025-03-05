@@ -3,6 +3,14 @@ import { TMealProvider } from "./mealProvider.interface";
 
 const mealProviderSchema = new Schema<TMealProvider>(
   {
+    availableMeals: {
+      type: [Schema.Types.ObjectId],
+      ref: "Meal",
+    },
+    reviews: {
+      type: [Schema.Types.ObjectId],
+      ref: "Review",
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -32,8 +40,9 @@ const mealProviderSchema = new Schema<TMealProvider>(
       type: [String],
       required: true,
     },
+
     experience: {
-      type: String,
+      type: Number,
       required: true,
     },
   },

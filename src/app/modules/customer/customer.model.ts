@@ -28,6 +28,10 @@ const customerSchema = new Schema<TCustomer>(
       type: String,
       required: true,
     },
+    preferences: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,
