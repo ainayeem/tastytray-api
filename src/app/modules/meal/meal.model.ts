@@ -45,7 +45,6 @@ const mealSchema = new Schema<TMeal>(
     },
     imgUrl: {
       type: String,
-      required: [true, "Image URL is required"],
     },
   },
   {

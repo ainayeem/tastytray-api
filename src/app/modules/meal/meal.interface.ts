@@ -10,5 +10,5 @@ export type TMeal = {
   category: string;
   portionSize: string;
   dietaryPreferences?: string[];
-  imgUrl: string;
+  imgUrl?: string;
 };
