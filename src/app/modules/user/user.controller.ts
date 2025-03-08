@@ -42,8 +42,37 @@ const login = catchAsync(async (req, res) => {
   });
 });
 
+const getMyProfile = catchAsync(async (req, res) => {
+  const user = req.user;
+
+  const result = await UserServices.getMyProfileFromDB(user);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "User profile fetched successfully",
+    data: result,
+  });
+});
+
+const updateMyProfile = catchAsync(async (req, res) => {
+  const user = req.user;
+  const updateData = req.body;
+
+  const result = await UserServices.updateMyProfileInDB(user, updateData);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "User profile updated successfully",
+    data: result,
+  });
+});
+
 export const UserControllers = {
   createMealProvider,
   createCustomer,
   login,
+  getMyProfile,
+  updateMyProfile,
 };

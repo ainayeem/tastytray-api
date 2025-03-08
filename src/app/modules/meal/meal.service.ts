@@ -16,7 +16,11 @@ const createMealInDB = async (payload: TMeal, userId: Types.ObjectId) => {
 };
 
 const getAllMealsFromDB = async (query: Record<string, unknown>) => {
-  const MealSearchableFields = ["name", "description", "category"];
+  const MealSearchableFields = [
+    // "name", "description", "category",
+    "dietaryPreferences",
+    "mealProvider.name",
+  ];
   const mealQuery = new QueryBuilder(Meal.find().populate("mealProvider"), query).search(MealSearchableFields).filter().sort().paginate().fields();
 
   const result = await mealQuery.modelQuery;

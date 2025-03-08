@@ -8,6 +8,7 @@ import { User } from "../user/user.model";
 import { Order } from "./order.model";
 
 const createOrderInDB = async (user: JwtPayload, payload: { meals: { meal: string; quantity: number }[]; customizations?: string[] }) => {
+  console.log("payload", payload);
   if (!payload?.meals?.length) {
     throw new AppError(StatusCodes.NOT_ACCEPTABLE, "Meals are required");
   }
@@ -51,7 +52,7 @@ const getAllOrderFromDB = async (query: Record<string, unknown>, user: JwtPayloa
   }
 
   const OrderSearchableFields = ["status"];
-  const orderQuery = new QueryBuilder(Order.find({ mealProvider: mealProvider._id }), query)
+  const orderQuery = new QueryBuilder(Order.find({ mealProvider: mealProvider._id }).populate("meals.meal"), query)
     .search(OrderSearchableFields)
     .filter()
     .sort()

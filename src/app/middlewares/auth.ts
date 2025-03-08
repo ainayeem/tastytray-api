@@ -21,9 +21,10 @@ const auth = (...requiredRoles: TUserRole[]) => {
     try {
       decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
     } catch (err) {
+      console.log("🚀 ~ returncatchAsync ~ err:", err);
       throw new AppError(StatusCodes.UNAUTHORIZED, "Unauthorized");
     }
-    const { _id, email, role } = decoded;
+    const { email, role } = decoded;
 
     // checking if the user is exist
     const user = await User.isUserExistsByEmail(email);

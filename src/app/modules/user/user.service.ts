@@ -1,4 +1,5 @@
 import { StatusCodes } from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import config from "../../config";
 import AppError from "../../errors/AppError";
@@ -39,14 +40,21 @@ const createMealProviderInDB = async (password: string, mealProviderData: TMealP
     await session.commitTransaction();
     await session.endSession();
     return newMealProvider;
-  } catch (err: any) {
+  } catch (err) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    // Convert the error to a string before passing it to the Error constructor
+    const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+    throw new Error(errorMessage);
   }
 };
 
 const createCustomerInDB = async (password: string, customerData: TCustomer) => {
+  // checking if the user is exist
+  const user = await User.isUserExistsByEmail(customerData.email);
+  if (user) {
+    throw new AppError(StatusCodes.CONFLICT, "User is already exist!");
+  }
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -75,10 +83,12 @@ const createCustomerInDB = async (password: string, customerData: TCustomer) => 
     await session.commitTransaction();
     await session.endSession();
     return newCustomer;
-  } catch (err: any) {
+  } catch (err) {
     await session.abortTransaction();
     await session.endSession();
-    throw new Error(err);
+    // Convert the error to a string before passing it to the Error constructor
+    const errorMessage = err instanceof Error ? err.message : "An unknown error occurred";
+    throw new Error(errorMessage);
   }
 };
 
@@ -106,8 +116,41 @@ const loginInDB = async (email: string, password: string) => {
   return accessToken;
 };
 
+const getMyProfileFromDB = async (user: JwtPayload) => {
+  if (user.role === "customer") {
+    const customer = await Customer.findOne({ user: user._id }).populate("user", "email role").lean();
+    return customer;
+  } else if (user.role === "mealProvider") {
+    const mealProvider = await MealProvider.findOne({ user: user._id }).populate("user", "email role").lean();
+    return mealProvider;
+  } else {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Invalid user role");
+  }
+};
+
+const updateMyProfileInDB = async (user: JwtPayload, updateData: TMealProvider | TCustomer) => {
+  const dbUser = await User.findById(user._id);
+  if (!dbUser) {
+    throw new AppError(StatusCodes.NOT_FOUND, "User not found");
+  }
+  if (dbUser._id.toString() !== user._id) {
+    throw new AppError(StatusCodes.FORBIDDEN, "You are not authorized to update this user");
+  }
+  if (user.role === "customer") {
+    const customer = await Customer.findOneAndUpdate({ user: user._id }, updateData, { new: true }).populate("user", "email role").lean();
+    return customer;
+  } else if (user.role === "mealProvider") {
+    const mealProvider = await MealProvider.findOneAndUpdate({ user: user._id }, updateData, { new: true }).populate("user", "email role").lean();
+    return mealProvider;
+  } else {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Invalid user role");
+  }
+};
+
 export const UserServices = {
   createMealProviderInDB,
   createCustomerInDB,
   loginInDB,
+  getMyProfileFromDB,
+  updateMyProfileInDB,
 };
