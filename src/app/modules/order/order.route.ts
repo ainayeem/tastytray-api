@@ -11,4 +11,6 @@ router.get("/meal-provider-order", auth(USER_ROLE.mealProvider), OrderController
 
 router.get("/customer-order", auth(USER_ROLE.customer), OrderControllers.getCustomerOrders);
 
+router.patch("/:id", OrderControllers.updateOrder);
+
 export const OrderRoutes = router;

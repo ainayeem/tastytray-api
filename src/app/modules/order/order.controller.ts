@@ -4,7 +4,7 @@ import sendResponse from "../../utils/sendResponse";
 import { OrderServices } from "./order.service";
 
 const createOrder = catchAsync(async (req, res) => {
-  console.log("🚀 ~ createOrder ~ req:", req.body);
+  // console.log("🚀 ~ createOrder ~ req:", req.body);
   const user = req.user;
 
   const result = await OrderServices.createOrderInDB(user, req.body);
@@ -41,8 +41,21 @@ const getCustomerOrders = catchAsync(async (req, res) => {
   });
 });
 
+const updateOrder = catchAsync(async (req, res) => {
+  const { id: orderId } = req.params;
+  const result = await OrderServices.updateOrderInDB(orderId, req.body);
+
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Order updated succesfully",
+    data: result,
+  });
+});
+
 export const OrderControllers = {
   createOrder,
   getAllOrders,
   getCustomerOrders,
+  updateOrder,
 };

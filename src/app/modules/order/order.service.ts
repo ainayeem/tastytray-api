@@ -5,10 +5,11 @@ import AppError from "../../errors/AppError";
 import { Meal } from "../meal/meal.model";
 import { MealProvider } from "../mealProvider/mealProvider.model";
 import { User } from "../user/user.model";
+import { TOrder } from "./order.interface";
 import { Order } from "./order.model";
 
 const createOrderInDB = async (user: JwtPayload, payload: { meals: { meal: string; quantity: number }[]; customizations?: string[] }) => {
-  console.log("payload", payload);
+  // console.log("payload", payload);
   if (!payload?.meals?.length) {
     throw new AppError(StatusCodes.NOT_ACCEPTABLE, "Meals are required");
   }
@@ -86,8 +87,17 @@ const getCustomerOrderFromDB = async (query: Record<string, unknown>, user: JwtP
   };
 };
 
+const updateOrderInDB = async (id: string, payload: Partial<TOrder>) => {
+  const result = await Order.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
+  if (!result) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Order not found!");
+  }
+  return result;
+};
+
 export const OrderServices = {
   createOrderInDB,
   getAllOrderFromDB,
   getCustomerOrderFromDB,
+  updateOrderInDB,
 };
